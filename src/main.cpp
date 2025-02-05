@@ -1,21 +1,32 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <cmath>
 #include <iostream>
 
 const char* vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3 aColor;
+
+    out vec3 attrColor;
 
     void main() {
         gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+        attrColor = aColor;
     }
 )";
 const char* fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
 
+    in vec3 attrColor;
+
+    uniform vec4 uniColor;
+
     void main() {
-        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+        // FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+        // FragColor = uniColor;
+        FragColor = vec4(attrColor, 1.0f);
     }
 )";
 
@@ -33,6 +44,52 @@ void preccess_input_callback(GLFWwindow *window, int key, int scancode, int acti
 void processInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+static void generateVAO(unsigned int &VAO, float *vertices, int vert_size, unsigned int *indices, int indx_size) {
+    // float vertices[] = {
+    //     // original triangle
+    //     -0.5f, -0.5f, 0.0f,
+    //      0.5f, -0.5f, 0.0f,
+    //      0.0f,  0.5f, 0.0f
+    //     // square (two tringle without overlaps)
+    //     // 0.5f,  0.5f, 0.0f, // quad. 1 - top-right
+    //     // 0.5f, -0.5f, 0.0f, // quad. 4 - bottom-right
+    //     //-0.5f, -0.5f, 0.0f, // quad. 3 - bottom-left
+    //     //-0.5f,  0.5f, 0.0f, // quad. 2 - top-left
+    // };
+
+    // unsigned int indices[] = {
+    //     0, 1, 2, // 1st triangle indices
+    //     // 1, 2, 3  // 2th triangle indices
+    //     // 4, 5, 6
+    // };
+
+    // gen and bind Vertex Array Object (VAO)
+    // unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // gen and bind Vertex Buffer Object (VBO)
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vert_size, vertices, GL_STATIC_DRAW);
+
+    // gen and bind Element Buffer Object (EBO)
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indx_size, indices, GL_STATIC_DRAW);
+
+    // set location and data format of vertex attributes (vertices[] linkage to shader)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    // unbind objects
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 int main() {
@@ -63,7 +120,7 @@ int main() {
     // set callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     // glfwSetKeyCallback(window, preccess_input_callback);
-    
+
     // OpenGL Objects 
     // Objects are manage following a pattern similar to this:
     // 1. Declare an `unsigned int ref`
@@ -130,20 +187,27 @@ int main() {
     }
 
     float vertices[] = {
-        // original triangle
-        // -0.5f, -0.5f, 0.0f,
-        //  0.5f, -0.5f, 0.0f,
-        //  0.5f,  0.5f, 0.0f
+        // triangle
+        // positions             // colors
+        // -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
+        //  0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+        //  0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f
+
         // square (two tringle without overlaps)
-         0.5f,  0.5f, 0.0f, // quad. 1 - top-right
-         0.5f, -0.5f, 0.0f, // quad. 4 - bottom-right
-        -0.5f, -0.5f, 0.0f, // quad. 3 - bottom-left
-        -0.5f,  0.5f, 0.0f, // quad. 2 - top-left
+        // positions          // colors
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // quad. 1 - top-right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // quad. 4 - bottom-right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f, // quad. 3 - bottom-left
+        -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f  // quad. 2 - top-left
     };
 
     unsigned int indices[] = {
-        0, 1, 3, // 1st triangle indices
-        1, 2, 3  // 2th triangle indices
+        // triangle
+        // 0, 1, 2
+
+        // square
+        0, 1, 3,
+        1, 2, 3
     };
 
     // gen and bind Vertex Array Object (VAO)
@@ -164,10 +228,11 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // set location and data format of vertex attributes (vertices[] linkage to shader)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
-    // unbind objects
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -183,8 +248,16 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 0.1f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // use shader program, bind VAO and set primitive
+        // use shader program
         glUseProgram(shaderProgram);
+
+        // set uniform in each frame
+        // float time_value = glfwGetTime();
+        // float green_value = sin(time_value) / 2.0f + 0.5f;
+        // int vertex_color_location = glGetUniformLocation(shaderProgram, "uniColor");
+        // glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
+
+        // bind VAO and set primitive
         glBindVertexArray(VAO);
         // used to draw without EBO
         // glDrawArrays(GL_TRIANGLES, 0, 3);
