@@ -13,7 +13,17 @@ find_package(glfw3 REQUIRED)
 # Add executable
 add_executable(${PROJECT_NAME} 
     src/main.cpp
+    # src/basic_impl.cpp
 )
+
+# add sources to target
+target_sources(${PROJECT_NAME} PRIVATE 
+    src/shader.hpp
+    src/shader.cpp
+)
+
+# add headers to target
+# target_include_directories(${PROJECT_NAME} ...)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} 
