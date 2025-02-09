@@ -2,10 +2,11 @@
 #define SHADER_HPP
 
 #include <GL/glew.h>
+
 #include <string>
 
 class Shader {
-public:
+  public:
     unsigned int shader_program_id_;
     const std::string shader_location_ = "../src/shaders/";
 
@@ -17,9 +18,10 @@ public:
     void setFloat(const std::string &name, float value);
 
     virtual ~Shader();
-private:
+
+  private:
     void source(std::string &shader_source, std::string shader_name);
-    void process(unsigned int &shader_program, const char* vertex_shader, const char* fragment_shader);
+    void process(unsigned int &shader_program, const char *vertex_source, const char *fragment_source);
 };
 
 #endif

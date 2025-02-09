@@ -1,0 +1,27 @@
+BasedOnStyle: Google
+IndentWidth: '4'
+TabWidth: '4'
+ColumnLimit: 120
+AccessModifierOffset: -2
+
+KeepEmptyLines:
+  AtEndOfFile: true
+
+# AlignConsecutiveAssignments: false
+# AlignConsecutiveAssignments: AcrossEmptyLines
+# AlignConsecutiveAssignments:
+#   Enabled: true
+#   AcrossComments: false
+
+# AlignConsecutiveDeclarations: AcrossEmptyLines
+# AlignConsecutiveDeclarations:
+#   Enabled: false
+#   AcrossEmptyLines: false
+#   AcrossComments: false
+
+AlignConsecutiveMacros: AcrossEmptyLines
+AllowShortFunctionsOnASingleLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+ReflowComments: false
+

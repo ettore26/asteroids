@@ -1,24 +1,24 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <cmath>
 #include <iostream>
 
 #include "shader.hpp"
 
-
-void framebuffer_size_callback(GLFWwindow* window, int with, int height) {
+void framebuffer_size_callback(GLFWwindow *window, int with, int height) {
     glViewport(0, 0, with, height);
 }
 
 void preccess_input_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    if(key == GLFW_KEY_ESCAPE)
+    if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, true);
     std::cout << "input callback!" << std::endl;
-    printf("key: %d | scancode: %d | action: %d | mode: %d\n", key,  scancode, action, mods);
+    printf("key: %d | scancode: %d | action: %d | mode: %d\n", key, scancode, action, mods);
 }
 
 void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
 
@@ -30,8 +30,8 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // create OpenGL context and make it the current
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL Window", NULL, NULL);
-    if(window == NULL) {
+    GLFWwindow *window = glfwCreateWindow(800, 600, "OpenGL Window", NULL, NULL);
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -39,7 +39,7 @@ int main() {
     glfwMakeContextCurrent(window);
 
     // init glew
-    if(glewInit() != GLEW_OK) {
+    if (glewInit() != GLEW_OK) {
         std::cout << "Failed to initialize GLEW" << std::endl;
         return -1;
     }
@@ -51,7 +51,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     // glfwSetKeyCallback(window, preccess_input_callback);
 
-    // OpenGL Objects 
+    // OpenGL Objects
     // Objects are manage following a pattern similar to this:
     // 1. Declare an `unsigned int ref`
     // 2. Associate an `unsigned int ref` to a new object type
@@ -79,10 +79,10 @@ int main() {
 
         // square (two tringle without overlaps)
         // positions          // colors
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // quad. 1 - top-right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // quad. 4 - bottom-right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f, // quad. 3 - bottom-left
-        -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f  // quad. 2 - top-left
+        0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f,  // quad. 1 - top-right
+        0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // quad. 4 - bottom-right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // quad. 3 - bottom-left
+        -0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 0.0f   // quad. 2 - top-left
     };
 
     unsigned int indices[] = {
@@ -90,8 +90,8 @@ int main() {
         // 0, 1, 2
 
         // square
-        0, 1, 3,
-        1, 2, 3
+        0, 1, 3,  //
+        1, 2, 3,  //
     };
 
     // gen and bind Vertex Array Object (VAO)
@@ -112,9 +112,9 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // set location and data format of vertex attributes (vertices[] linkage to shader)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -133,7 +133,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // use shader program
-        //glUseProgram(shaderProgram);
+        // glUseProgram(shaderProgram);
         someShader.use();
 
         // set uniform in each frame

@@ -1,4 +1,5 @@
 #include "shader.hpp"
+
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -43,8 +44,7 @@ void Shader::source(std::string &shader_source, std::string shader_name) {
     std::string vertex_path = Shader::shader_location_ + shader_name;
     shader_file.open(vertex_path);
 
-    if (!shader_file.is_open() && 
-        !shader_file.is_open()) {
+    if (!shader_file.is_open() && !shader_file.is_open()) {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
     }
 
@@ -55,11 +55,11 @@ void Shader::source(std::string &shader_source, std::string shader_name) {
     shader_source = vertex_shader_stream.str();
 }
 
-void Shader::process(unsigned int &shader_program_id, const char* vertex_shader_code, const char* fragment_shader_code) {
+void Shader::process(unsigned int &shader_program_id, const char *vertex_source, const char *fragment_source) {
     // create, source and compile vertex shader
     unsigned int vertex_shader;
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_code, NULL);
+    glShaderSource(vertex_shader, 1, &vertex_source, NULL);
     glCompileShader(vertex_shader);
 
     // validate shader compilation
@@ -74,7 +74,7 @@ void Shader::process(unsigned int &shader_program_id, const char* vertex_shader_
     // create, source and compile fragment shader
     unsigned int fragment_shader;
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_code, NULL);
+    glShaderSource(fragment_shader, 1, &fragment_source, NULL);
     glCompileShader(fragment_shader);
 
     // validate shader compilation
